@@ -40,15 +40,46 @@ jobs:
         run: |
           npx expo prebuild --platform android --clean 2>&1 | tail -20
 
-      - name: Build APK with Gradle
+      - name: Generate debug keystore
+        run: |
+          mkdir -p android/app/keystore
+          keytool -genkeypair -v -keystore android/app/keystore/debug.keystore \
+            -alias debug -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" 2>&1 | tail -5
+
+      - name: Configure release signing
+        run: |
+          cat >> android/app/build.gradle << 'EOF'
+
+android {
+    signingConfigs {
+        release {
+            storeFile file('keystore/debug.keystore')
+            storePassword 'android'
+            keyAlias 'debug'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+EOF
+
+      - name: Build Release APK with Gradle
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon 2>&1 | tail -30
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -50
 
       - name: Find and rename APK
         run: |
-          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -type f 2>/dev/null | head -1)
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" -type f 2>/dev/null | head -1)
           if [ -n "$APK_PATH" ]; then
             APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
             echo "APK Size: $APK_SIZE"
