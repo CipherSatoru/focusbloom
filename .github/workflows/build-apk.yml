@@ -67,7 +67,8 @@ jobs:
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -100
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -200
 
       - name: Find and rename APK
         run: |
