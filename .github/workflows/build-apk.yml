@@ -1,6 +1,9 @@
-name: Build APK:    push:
-        branches: [main]
-    workflow_dispatch:
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-android:
@@ -26,3 +29,62 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Remove old native code
+        run: rm -rf android ios
+
+      - name: Install npm dependencies
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: Prebuild native code
+        run: npx expo prebuild --platform android --clean 2>&1 | tail -20
+
+      - name: Generate debug keystore
+        run: |
+          mkdir -p android/app/keystore
+          keytool -genkeypair -v -keystore android/app/keystore/debug.keystore -alias debug -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" 2>&1 | tail -5
+
+      - name: Write signing config
+        run: |
+          echo '    signingConfigs {' > android/app/signing.gradle
+          echo '        release {' >> android/app/signing.gradle
+          echo '            storeFile file("keystore/debug.keystore")' >> android/app/signing.gradle
+          echo '            storePassword "android"' >> android/app/signing.gradle
+          echo '            keyAlias "debug"' >> android/app/signing.gradle
+          echo '            keyPassword "android"' >> android/app/signing.gradle
+          echo '        }' >> android/app/signing.gradle
+          echo '    }' >> android/app/signing.gradle
+          echo '    buildTypes {' >> android/app/signing.gradle
+          echo '        release {' >> android/app/signing.gradle
+          echo '            signingConfig signingConfigs.release' >> android/app/signing.gradle
+          echo '            minifyEnabled false' >> android/app/signing.gradle
+          echo '            shrinkResources false' >> android/app/signing.gradle
+          echo '        }' >> android/app/signing.gradle
+          echo '    }' >> android/app/signing.gradle
+          sed -i '/^android {/r android/app/signing.gradle' android/app/build.gradle
+
+      - name: Build Release APK with Gradle
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -100
+
+      - name: Find and rename APK
+        run: |
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" -type f 2>/dev/null | head -1)
+          if [ -n "$APK_PATH" ]; then
+            APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+            echo "APK Size: $APK_SIZE"
+            cp "$APK_PATH" focusbloom-release.apk
+          else
+            echo "ERROR: No APK found"
+            find android/app/build/outputs -type f 2>/dev/null | head -20
+            exit 1
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: focusbloom-apk
+          path: focusbloom-release.apk
+          retention-days: 30
