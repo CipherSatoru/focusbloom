@@ -50,23 +50,25 @@ jobs:
 
       - name: Configure release signing
         run: |
-          # Insert signing config into the existing android block in build.gradle
-          sed -i '/^android {/a\
-    signingConfigs {\
-        release {\
-            storeFile file("keystore/debug.keystore")\
-            storePassword "android"\
-            keyAlias "debug"\
-            keyPassword "android"\
-        }\
-    }\
-    buildTypes {\
-        release {\
-            signingConfig signingConfigs.release\
-            minifyEnabled false\
-            shrinkResources false\
-        }\
-    }' android/app/build.gradle
+          cat > /tmp/signing.gradle << 'EOF'
+    signingConfigs {
+        release {
+            storeFile file("keystore/debug.keystore")
+            storePassword "android"
+            keyAlias "debug"
+            keyPassword "android"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+EOF
+          # Insert after 'android {'
+          sed -i '/^android {/r /tmp/signing.gradle' android/app/build.gradle
 
       - name: Build Release APK with Gradle
         run: |
