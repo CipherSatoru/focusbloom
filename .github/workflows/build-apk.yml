@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -35,26 +34,26 @@ jobs:
         run: rm -rf android ios
 
       - name: Install npm dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Prebuild native code
-        run: npx expo prebuild --platform android --clean
+        run: |
+          yes | npx expo prebuild --platform android --clean 2>&1 | tail -20
 
       - name: Build APK (Release)
         run: |
-          npx expo run:android --mode release 2>&1 | tail -40
+          npx expo run:android --mode release 2>&1 | tail -50
 
       - name: Find and rename APK
         run: |
-          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -1)
-          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -type f 2>/dev/null | head -1)
           if [ -n "$APK_PATH" ]; then
             APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
             echo "APK Size: $APK_SIZE"
             cp "$APK_PATH" focusbloom-release.apk
           else
             echo "ERROR: No APK found"
-            find android/app/build/outputs -name "*.apk" -type f
+            find android/app/build/outputs -type f 2>/dev/null | head -20
             exit 1
           fi
 
