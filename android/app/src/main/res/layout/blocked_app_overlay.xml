@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Blocked App Overlay Layout
+
+  This overlay is shown when a user tries to open a blocked app.
+  CRITICAL: There is NO "Ignore" button. The only way to dismiss
+  this overlay is through the app's emergency unlock logic
+  (math problem + activity goal).
+
+  This is the core loophole patch: unlike Apple Screen Time's
+  "Ignore Limit" button, there is no system-level override
+  available from within the moment of craving.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#801A1A18">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <!-- App name being blocked -->
+        <TextView
+            android:id="@+id/blocked_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="App Blocked"
+            android:textSize="24sp"
+            android:textColor="#E8E5DD"
+            android:textStyle="bold"
+            android:fontFamily="serif"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Message -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Your study session is active. This app is blocked until you complete your habits or solve the emergency unlock."
+            android:textSize="14sp"
+            android:textColor="#B8B5AB"
+            android:layout_marginBottom="24dp"
+            android:gravity="center" />
+
+        <!-- Emergency unlock button — NOT an "Ignore" button -->
+        <!-- This triggers the math problem flow in the app -->
+        <Button
+            android:id="@+id/emergency_unlock_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emergency Unlock"
+            android:textSize="14sp"
+            android:textColor="#E8E5DD"
+            android:backgroundTint="#2D5A3D"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</FrameLayout>

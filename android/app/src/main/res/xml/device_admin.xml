@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Device Admin configuration for FocusBloom.
+  Defines the policies that the device admin enforces.
+-->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <!-- Prevent uninstallation during active blocks -->
+        <force-remove-apps />
+        <!-- Lock the device if needed -->
+        <wipe-data />
+    </uses-policies>
+</device-admin>

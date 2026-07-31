@@ -1,0 +1,66 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Remove old native code
+        run: rm -rf android ios
+
+      - name: Install npm dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Prebuild native code
+        run: npx expo prebuild --platform android --clean
+
+      - name: Build APK (Release)
+        run: |
+          npx expo run:android --mode release 2>&1 | tail -40
+
+      - name: Find and rename APK
+        run: |
+          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+          if [ -n "$APK_PATH" ]; then
+            APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+            echo "APK Size: $APK_SIZE"
+            cp "$APK_PATH" focusbloom-release.apk
+          else
+            echo "ERROR: No APK found"
+            find android/app/build/outputs -name "*.apk" -type f
+            exit 1
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: focusbloom-apk
+          path: focusbloom-release.apk
+          retention-days: 30

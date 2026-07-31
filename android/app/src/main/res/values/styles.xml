@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/secondary</item>
+    </style>
+
+    <color name="primary">#2D5A3D</color>
+    <color name="primary_dark">#244A32</color>
+    <color name="secondary">#D4A373</color>
+    <color name="background">#F8F4E9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#2A2A2A</color>
+    <color name="text_secondary">#6B6B6B</color>
+</resources>

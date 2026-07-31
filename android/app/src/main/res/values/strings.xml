@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FocusBloom</string>
+    <string name="accessibility_service_description">
+        FocusBloom uses this service to detect when you open blocked apps and prevent access during study sessions.
+    </string>
+    <string name="device_admin_description">
+        FocusBloom device admin prevents uninstallation during active focus sessions.
+    </string>
+</resources>

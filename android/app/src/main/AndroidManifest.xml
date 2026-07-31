@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AndroidManifest.xml additions for FocusBloom
+
+  This file shows the required permissions and service declarations
+  for the app blocking and usage tracking features.
+
+  In a real Expo project, these would be merged into the main
+  AndroidManifest.xml via the expo config plugins.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.focusbloom">
+
+    <!-- Permissions required for app blocking and usage tracking -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:name=".FocusBloomApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <!-- Device Admin Receiver — prevents uninstallation during active blocks -->
+        <receiver
+            android:name=".FocusBloomDeviceAdmin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml.device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Accessibility Service — detects and blocks app openings -->
+        <service
+            android:name=".AppBlockerService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml.accessibility_service_config" />
+        </service>
+
+        <!-- Notification Listener Service — blocks notifications from blocked apps -->
+        <service
+            android:name=".FocusBloomNotificationListener"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Boot Receiver — re-apply blocks after reboot -->
+        <receiver
+            android:name=".FocusBloomBootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

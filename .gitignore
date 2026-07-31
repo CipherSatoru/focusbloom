@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+npm-debug.log
+.expo/
+.webpack/
+
+# Expo
+.expo-shared/
+.expo-go/
+
+# Android
+android/app/build/
+android/app/src/main/java/com/focusbloom/BuildConfig.java
+android/local.properties
+android/gradle.properties
+
+# iOS
+ios/Pods/
+ios/build/
+ios/FocusBloom.xcodeproj
+ios/FocusBloom.xcworkspace
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Env
+.env
+.env.local
+
+# Logs
+*.log
+logs/

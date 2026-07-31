@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "FocusBloom",
+    "slug": "focusbloom",
+    "version": "1.0.0",
+    "description": "A mobile app to help manage phone addiction while preserving study functionality.",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F8F4E9",
+    "splash": {
+      "backgroundColor": "#F8F4E9"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.focusbloom.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8F4E9"
+      },
+      "package": "com.focusbloom.app",
+      "permissions": [
+        "PACKAGE_USAGE_STATS",
+        "BIND_ACCESSIBILITY_SERVICE",
+        "RECEIVE_BOOT_COMPLETED",
+        "FOREGROUND_SERVICE",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-task-manager",
+      "expo-background-fetch",
+      [
+        "expo-notifications",
+        {
+          "color": "#2D5A3D"
+        }
+      ]
+    ]
+  }
+}
