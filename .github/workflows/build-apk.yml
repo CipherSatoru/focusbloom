@@ -37,8 +37,7 @@ jobs:
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Prebuild native code
-        run: |
-          npx expo prebuild --platform android --clean 2>&1 | tail -20
+        run: npx expo prebuild --platform android --clean 2>&1 | tail -20
 
       - name: Generate debug keystore
         run: |
@@ -50,7 +49,7 @@ jobs:
 
       - name: Configure release signing
         run: |
-          cat > android/app/signing-config.gradle << 'ENDOFFILE'
+          cat > android/app/signing.gradle << 'EOF'
     signingConfigs {
         release {
             storeFile file("keystore/debug.keystore")
@@ -66,8 +65,8 @@ jobs:
             shrinkResources false
         }
     }
-ENDOFFILE
-          sed -i '/^android {/r android/app/signing-config.gradle' android/app/build.gradle
+EOF
+          sed -i '/^android {/r android/app/signing.gradle' android/app/build.gradle
 
       - name: Build Release APK with Gradle
         run: |
