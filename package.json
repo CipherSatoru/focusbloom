@@ -34,7 +34,8 @@
     "@types/react": "*",
     "typescript": "*",
     "eslint": "*",
-    "eslint-config-expo": "*"
+    "eslint-config-expo": "*",
+    "babel-plugin-module-resolver": "*"
   },
   "private": true
 }
