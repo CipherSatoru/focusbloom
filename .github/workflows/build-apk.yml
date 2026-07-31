@@ -50,33 +50,29 @@ jobs:
 
       - name: Configure release signing
         run: |
-          cat > android/app/signing.gradle << 'EOF'
-          android {
-              signingConfigs {
-                  release {
-                      storeFile file('keystore/debug.keystore')
-                      storePassword 'android'
-                      keyAlias 'debug'
-                      keyPassword 'android'
-                  }
-              }
-              buildTypes {
-                  release {
-                      signingConfig signingConfigs.release
-                      minifyEnabled false
-                      shrinkResources false
-                  }
-              }
-          }
-          EOF
-          # Apply the signing config by adding apply from: 'signing.gradle' to build.gradle
-          sed -i "/^android {/i apply from: 'signing.gradle'" android/app/build.gradle
+          # Insert signing config into the existing android block in build.gradle
+          sed -i '/^android {/a\
+    signingConfigs {\
+        release {\
+            storeFile file("keystore/debug.keystore")\
+            storePassword "android"\
+            keyAlias "debug"\
+            keyPassword "android"\
+        }\
+    }\
+    buildTypes {\
+        release {\
+            signingConfig signingConfigs.release\
+            minifyEnabled false\
+            shrinkResources false\
+        }\
+    }' android/app/build.gradle
 
       - name: Build Release APK with Gradle
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -50
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -100
 
       - name: Find and rename APK
         run: |
