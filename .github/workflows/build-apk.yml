@@ -49,7 +49,7 @@ jobs:
 
       - name: Configure release signing
         run: |
-          cat > android/app/signing.gradle << 'EOF'
+          cat > android/app/signing.gradle << 'SIGNING_EOF'
     signingConfigs {
         release {
             storeFile file("keystore/debug.keystore")
@@ -65,7 +65,7 @@ jobs:
             shrinkResources false
         }
     }
-EOF
+SIGNING_EOF
           sed -i '/^android {/r android/app/signing.gradle' android/app/build.gradle
 
       - name: Build Release APK with Gradle
