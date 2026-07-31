@@ -38,11 +38,11 @@ jobs:
 
       - name: Prebuild native code
         run: |
-          yes | npx expo prebuild --platform android --clean 2>&1 | tail -20
+          npx expo prebuild --platform android --clean 2>&1 | tail -20
 
-      - name: Build APK (Release)
+      - name: Build APK (Debug)
         run: |
-          npx expo run:android --mode release 2>&1 | tail -50
+          npx expo run:android --variant=debug 2>&1 | tail -50
 
       - name: Find and rename APK
         run: |
