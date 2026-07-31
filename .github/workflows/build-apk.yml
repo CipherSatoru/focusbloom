@@ -1,95 +1,10 @@
 name: Build APK
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
-  build-android:
-    name: Build Android APK
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Remove old native code
-        run: rm -rf android ios
-
-      - name: Install npm dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
-
-      - name: Prebuild native code
-        run: npx expo prebuild --platform android --clean 2>&1 | tail -20
-
-      - name: Generate debug keystore
-        run: |
-          mkdir -p android/app/keystore
-          keytool -genkeypair -v -keystore android/app/keystore/debug.keystore \
-            -alias debug -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass android -keypass android \
-            -dname "CN=Android Debug,O=Android,C=US" 2>&1 | tail -5
-
-      - name: Configure release signing
-        run: |
-          cat > android/app/signing.gradle << 'SIGNING_EOF'
-    signingConfigs {
-        release {
-            storeFile file("keystore/debug.keystore")
-            storePassword "android"
-            keyAlias "debug"
-            keyPassword "android"
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            shrinkResources false
-        }
-    }
-SIGNING_EOF
-          sed -i '/^android {/r android/app/signing.gradle' android/app/build.gradle
-
-      - name: Build Release APK with Gradle
-        run: |
-          cd android
-          chmod +x ./gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -100
-
-      - name: Find and rename APK
-        run: |
-          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" -type f 2>/dev/null | head -1)
-          if [ -n "$APK_PATH" ]; then
-            APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
-            echo "APK Size: $APK_SIZE"
-            cp "$APK_PATH" focusbloom-release.apk
-          else
-            echo "ERROR: No APK found"
-            find android/app/build/outputs -type f 2>/dev/null | head -20
-            exit 1
-          fi
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: focusbloom-apk
-          path: focusbloom-release.apk
-          retention-days: 30
+      - run: echo "Hello World"
